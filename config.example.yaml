@@ -106,6 +106,8 @@ ai:
       base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
       api_key: sk-xxxxxxx
       model: qwen3-max
+      extra_headers:
+        x-opencode-session: "550e8400-e29b-41d4-a716-446655440000"
       max_total_tokens: 120000
       max_completion_tokens: 32768
       # Eino 路径模型推理：DeepSeek/OpenAI 为 thinking / reasoning_effort；Claude 4.6+ 为 adaptive + output_config.effort（仅显式配置 effort 时下发）；3.7 为 enabled+budget_tokens:10000（文档示例），effort 不映射，自定义预算用 extra_request_fields

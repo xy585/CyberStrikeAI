@@ -30,6 +30,7 @@ func NewClaudeAgenticModel(
 	if cfg.IsDeepSeekEndpointOrModel() {
 		httpClient = newDeepSeekAnthropicCompatibleClient(httpClient)
 	}
+	httpClient = applyExtraHeadersHTTPClient(httpClient, cfg.ExtraHeaders)
 	return agenticclaude.New(ctx, &agenticclaude.Config{
 		APIKey:      strings.TrimSpace(cfg.APIKey),
 		BaseURL:     strings.TrimSuffix(strings.TrimSpace(cfg.BaseURL), "/"),
@@ -38,6 +39,36 @@ func NewClaudeAgenticModel(
 		HTTPClient:  httpClient,
 		ExtraFields: extraFields,
 	})
+}
+
+func applyExtraHeadersHTTPClient(base *http.Client, headers map[string]string) *http.Client {
+	if len(headers) == 0 {
+		return base
+	}
+	if base == nil {
+		base = http.DefaultClient
+	}
+	cloned := *base
+	transport := base.Transport
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
+	cloned.Transport = &extraHeadersRoundTripper{base: transport, headers: headers}
+	return &cloned
+}
+
+type extraHeadersRoundTripper struct {
+	base    http.RoundTripper
+	headers map[string]string
+}
+
+func (rt *extraHeadersRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	for k, v := range rt.headers {
+		if strings.TrimSpace(k) != "" && strings.TrimSpace(v) != "" {
+			req.Header.Set(k, v)
+		}
+	}
+	return rt.base.RoundTrip(req)
 }
 
 func AgenticText(msg *schema.AgenticMessage) (content, reasoning string) {

@@ -843,6 +843,8 @@ type OpenAIConfig struct {
 	MaxCompletionTokens int    `yaml:"max_completion_tokens,omitempty" json:"max_completion_tokens,omitempty"`
 	// Reasoning 控制 Eino ChatModel 的 thinking / reasoning_effort / output_config 等（Eino 单/多代理路径生效）。
 	Reasoning OpenAIReasoningConfig `yaml:"reasoning,omitempty" json:"reasoning,omitempty"`
+	// ExtraHeaders 额外注入到每个 LLM API 请求的 HTTP 头（如 OpenCode Go 的 x-opencode-session）。
+	ExtraHeaders map[string]string `yaml:"extra_headers,omitempty" json:"extra_headers,omitempty"`
 }
 
 // AIConfig stores first-class model channels. Runtime callers resolve a channel
@@ -861,6 +863,7 @@ type AIChannelConfig struct {
 	MaxTotalTokens      int                   `yaml:"max_total_tokens,omitempty" json:"max_total_tokens,omitempty"`
 	MaxCompletionTokens int                   `yaml:"max_completion_tokens,omitempty" json:"max_completion_tokens,omitempty"`
 	Reasoning           OpenAIReasoningConfig `yaml:"reasoning,omitempty" json:"reasoning,omitempty"`
+	ExtraHeaders        map[string]string     `yaml:"extra_headers,omitempty" json:"extra_headers,omitempty"`
 }
 
 func (c AIChannelConfig) ToOpenAIConfig() OpenAIConfig {
@@ -876,6 +879,7 @@ func (c AIChannelConfig) ToOpenAIConfig() OpenAIConfig {
 		MaxTotalTokens:      c.MaxTotalTokens,
 		MaxCompletionTokens: c.MaxCompletionTokens,
 		Reasoning:           c.Reasoning,
+		ExtraHeaders:        c.ExtraHeaders,
 	}
 }
 
@@ -892,6 +896,7 @@ func AIChannelFromOpenAI(id, name string, oa OpenAIConfig) AIChannelConfig {
 		MaxTotalTokens:      oa.MaxTotalTokens,
 		MaxCompletionTokens: oa.MaxCompletionTokens,
 		Reasoning:           oa.Reasoning,
+		ExtraHeaders:        oa.ExtraHeaders,
 	}
 }
 
